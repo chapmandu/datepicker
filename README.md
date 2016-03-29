@@ -1,4 +1,4 @@
-DatePicker V1.0.3
+DatePicker V1.0.4
 =================
 
 Use a jQuery UI datePicker widget in your CFWheels forms
