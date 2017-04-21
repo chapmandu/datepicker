@@ -1,153 +1,202 @@
-﻿<cfcomponent output="false" mixin="controller">
+﻿component output="false" mixin="controller" {
 
-	<cffunction name="init">
-		<cfset this.version = "1.1.7,1.1.8,1.3,1.3.1,1.3.2,1.3.3,1.4,1.4.1,1.4.2,1.4.3,1.4.4">
-		<cfreturn this>
-	</cffunction>
+	public function init() {
+		this.version = "2.0";
+		return this;
+	}
 
-	<!--- Place helper functions here that should be available for use in all view pages of your application --->
-	<cffunction name="datePicker" access="public" output="false" returntype="string">
-		<cfargument name="objectName" type="string" required="true">
-		<cfargument name="property" type="string" required="true">
-		<cfargument name="head" type="boolean" required="false" default="true">
-		<cfset $args(name="datePicker", args=arguments)>
-		<cfreturn $datePickerWriteOutput(argumentCollection=arguments)>
-	</cffunction>
+	public string function datePicker(
+		required string objectName,
+		required string property,
+		boolean head="true"
+	) {
+		$args(name="datePicker", args=arguments);
+		return $datePickerWriteOutput(argumentCollection=arguments);
+	}
 
-	<cffunction name="datePickerTag" access="public" output="false" returntype="string">
-		<cfargument name="name" type="string" required="true">
-		<cfargument name="value" type="string" required="false" default="">
-		<cfargument name="head" type="boolean" required="false" default="true">
-		<cfset $args(name="datePickerTag", args=arguments)>
-		<cfreturn $datePickerWriteOutput(argumentCollection=arguments)>
-	</cffunction>
+	public string function datePickerTag(
+		required string name,
+		string value="",
+		boolean head="true"
+	) {
+		$args(name="datePickerTag", args=arguments);
+		return $datePickerWriteOutput(argumentCollection=arguments);
+	}
 
-	<cffunction name="$datePickerWriteOutput" access="public" output="false">
-		<cfset var loc = {}>
-		<cfset loc.dp = $datePicker(argumentCollection=arguments)>
-		<!--- call wheels helper based on arguments supplied --->
-		<cfif StructKeyExists(arguments,"objectName")>
-			<cfset loc.return = textField(argumentCollection=loc.dp.helperArgs)>
-		<cfelseif StructKeyExists(arguments,"name")>
-			<cfset loc.return = textFieldTag(argumentCollection=loc.dp.helperArgs)>
-		</cfif>
-		<!--- deal with js output --->
-		<cfif arguments.head>
-			<cfhtmlhead text="#loc.dp.javascript#">
-		<cfelse>
-			<cfset loc.return = loc.dp.javascript & loc.return>
-		</cfif>
-		<cfreturn loc.return>
-	</cffunction>
+	public string function $datePickerWriteOutput() {
+		local.dp = $datePicker(argumentCollection=arguments);
+		//  call wheels helper based on arguments supplied
+		if ( StructKeyExists(arguments,"objectName") ) {
+			local.return = textField(argumentCollection=local.dp.helperArgs);
+		} else if ( StructKeyExists(arguments,"name") ) {
+			local.return = textFieldTag(argumentCollection=local.dp.helperArgs);
+		}
+		//  deal with js output
+		if ( arguments.head ) {
+			htmlhead text="#local.dp.javascript#";
+		} else {
+			local.return = local.dp.javascript & local.return;
+		}
+		return local.return;
+	}
 
-	<cffunction name="$datePicker" access="public" output="false">
-		<cfset var loc = {}>
-		<!--- default dateformat --->
-		<cfset loc.dateFormat = "mm/dd/yy">
+	public struct function $datePicker() {
+		local.rv = {};
+		//  default dateformat
+		local.rv.dateFormat = "mm/dd/yy";
+		if ( StructKeyExists(arguments, "dateFormat") ) {
+			local.rv.dateFormat = arguments.dateFormat;
+		}
+		//  the options available to me
+		local.rv.availableOptions = [
+			"disabled",
+			"altField",
+			"altFormat",
+			"appendText",
+			"autoSize",
+			"buttonImage",
+			"buttonImageOnly",
+			"buttonText",
+			"calculateWeek",
+			"changeMonth",
+			"changeYear",
+			"closeText",
+			"constrainInput",
+			"currentText",
+			"dateFormat",
+			"dayNames",
+			"dayNamesMin",
+			"dayNamesShort",
+			"defaultDate",
+			"duration",
+			"firstDay",
+			"gotoCurrent",
+			"hideIfNoPrevNext",
+			"isRTL",
+			"maxDate",
+			"minDate",
+			"monthNames",
+			"monthNamesShort",
+			"navigationAsDateFormat",
+			"nextText",
+			"numberOfMonths",
+			"prevText",
+			"selectOtherMonths",
+			"shortYearCutoff",
+			"showAnim",
+			"showButtonPanel",
+			"showCurrentAtPos",
+			"showMonthAfterYear",
+			"showOn",
+			"showOptions",
+			"showOtherMonths",
+			"showWeek",
+			"stepMonths",
+			"weekHeader",
+			"yearRange",
+			"yearSuffix",
+			"onChangeMonthYear",
+			"onClose",
+			"onSelect"
+		];
+		//  the arguments to pass to the cfwheels form helper function
+		local.rv.helperArgs = Duplicate(arguments);
+		//  apply date formatting to the object property.. is this the correct way to manipulate an object within a plugin?
+		if ( StructKeyExists(arguments,"objectName") ) {
+			if ( StructKeyExists(variables[arguments.objectName], arguments.property) ) {
+				local.rv.objectProperty = variables[arguments.objectName][arguments.property];
+			} else {
+				local.rv.objectProperty = "";
+			}
+			if ( IsDate(local.rv.objectProperty) ) {
+				variables[arguments.objectName][arguments.property] = DateFormat(
+					local.rv.objectProperty,
+					$datePickerMapDateMask(local.rv.dateFormat)
+				);
+			}
+		} else if ( StructKeyExists(arguments,"name") ) {
+			if ( IsDate(arguments.value) ) {
+				local.rv.helperArgs.value = DateFormat(local.rv.helperArgs.value, $datePickerMapDateMask(local.rv.dateFormat));
+			}
+		}
+		//  build the datepicker options object
+		local.rv.options = [];
+		StructDelete(local.rv.helperArgs,"head");
 
-		<cfif StructKeyExists(arguments,"dateFormat")>
-			<cfset loc.dateFormat = arguments.dateFormat>
-		</cfif>
+		for (local.rv.i in local.rv.availableOptions) {
+			//  remove the datepicker options from the co
+			StructDelete(local.rv.helperArgs, local.rv.i);
+			//  if it was supplied as an argument, use it
+			if ( StructKeyExists(arguments, local.rv.i) ) {
+				//  wrap strings in single quotes.. this needs more robustness.. (there's that word again!)
+				if ( IsNumeric(arguments[local.rv.i]) ) {
+				} else if ( Left(arguments[local.rv.i],1) == "{" && Right(arguments[local.rv.i],1) == "}" ) {
+				} else if ( Left(arguments[local.rv.i],1) == "[" && Right(arguments[local.rv.i],1) == "]" ) {
+				} else if ( ListFind("true,false", arguments[local.rv.i]) > 0 ) {
+				} else if ( ListFindNoCase("onChangeMonthYear,onClose,onSelect,beforeShowDay", local.rv.i) > 0 ) {
+				} else {
+					arguments[local.rv.i] = "'#arguments[local.rv.i]#'";
+				}
+				ArrayAppend(local.rv.options,"#local.rv.i#:#arguments[local.rv.i]#");
+			}
+		}
 
-		<!--- the options available to me --->
-		<cfset loc.availableOptions = "disabled,altField,altFormat,appendText,autoSize,buttonImage,buttonImageOnly,buttonText,calculateWeek,changeMonth,changeYear,closeText,constrainInput,currentText,dateFormat,dayNames,dayNamesMin,dayNamesShort,defaultDate,duration,firstDay,gotoCurrent,hideIfNoPrevNext,isRTL,maxDate,minDate,monthNames,monthNamesShort,navigationAsDateFormat,nextText,numberOfMonths,prevText,selectOtherMonths,shortYearCutoff,showAnim,showButtonPanel,showCurrentAtPos,showMonthAfterYear,showOn,showOptions,showOtherMonths,showWeek,stepMonths,weekHeader,yearRange,yearSuffix,onChangeMonthYear,onClose,onSelect">
-		<!--- the arguments to pass to the cfwheels form helper function --->
-		<cfset loc.helperArgs = Duplicate(arguments)>
+		//  define a selector
+		if ( StructKeyExists(arguments,"id") ) {
+			local.rv.selector = "###arguments.id#";
+		} else if ( StructKeyExists(arguments,"name") ) {
+			local.rv.selector = "###arguments.name#";
+		} else if ( StructKeyExists(arguments,"objectName") ) {
+			local.rv.selector = "###arguments.objectName#-#arguments.property#";
+		}
+		//  javascript
+		if ( ArrayLen(local.rv.options) ) {
+			local.rv.javascriptOptions = "{#ArrayToList(local.rv.options, ", ")#}";
+		} else {
+			local.rv.javascriptOptions = "";
+		}
+		local.rv.javascript = "<script>$(window).load(function() {$('#local.rv.selector#').datepicker(#local.rv.javascriptOptions#)});</script>";
+		return local.rv;
+	}
 
-		<!--- apply date formatting to the object property.. is this the correct way to manipulate an object within a plugin? --->
-		<cfif StructKeyExists(arguments,"objectName")>
-			<cfif StructKeyExists(variables[arguments.objectName], arguments.property)>
-				<cfset loc.objectProperty = variables[arguments.objectName][arguments.property]>
-			<cfelse>
-				<cfset loc.objectProperty = "">
-			</cfif>
-			<cfif IsDate(loc.objectProperty)>
-				<cfset variables[arguments.objectName][arguments.property] = DateFormat(loc.objectProperty, $datePickerMapDateMask(loc.dateFormat))>
-			</cfif>
-		<cfelseif StructKeyExists(arguments,"name")>
-			<cfif IsDate(arguments.value)>
-				<cfset loc.helperArgs.value = DateFormat(loc.helperArgs.value, $datePickerMapDateMask(loc.dateFormat))>
-			</cfif>
-		</cfif>
+	/**
+	 * Map common jquery date masks to CF.. i'm sure this could be elegant-er (?)
+	 *
+	 * datepicker
+	 * ==================================
+	 * d - day of month (no leading zero)
+	 * dd - day of month (two digit)
+	 * D - day name short
+	 * DD - day name long
+	 * m - month of year (no leading zero)
+	 * mm - month of year (two digit)
+	 * M - month name short
+	 * MM - month name long
+	 * y - year (two digit)
+	 * yy - year (four digit)
+	 *
+	 * CF
+	 * ==================================
+	 * d: Day of the month as digits; no leading zero for single-digit days.
+	 * dd: Day of the month as digits; leading zero for single-digit days.
+	 * ddd: Day of the week as a three-letter abbreviation.
+	 * dddd: Day of the week as its full name.
+	 * m: Month as digits; no leading zero for single-digit months.
+	 * mm: Month as digits; leading zero for single-digit months.
+	 * mmm: Month as a three-letter abbreviation.
+	 * mmmm: Month as its full name.
+	 * yy: Year as last two digits; leading zero for years less than 10.
+	 * yyyy: Year represented by four digits.
+	 * gg: Period/era string. Ignored. Reserved. The following masks tell how to format the full date and cannot be combined with other masks:
+	 * short: equivalent to m/d/y
+	 * medium: equivalent to mmm d, yyyy
+	 * long: equivalent to mmmm d, yyyy
+	 * full: equivalent to dddd, mmmm d, yyyy
+	 *
+	 * @mask a date format mask [d|dd|D|DD|m|mm|M|MM|y|yy]
+	 */
+	public string function $datePickerMapDateMask(required mask) {
+		return Replace(arguments.mask, "y", "yy", "all");
+	}
 
-		<!--- build the datepicker options object --->
-		<cfset loc.options = []>
-		<cfset StructDelete(loc.helperArgs,"head")>
-		<cfloop list="#loc.availableOptions#" index="loc.i">
-			<!--- remove the datepicker options from the co --->
-			<cfset StructDelete(loc.helperArgs,loc.i)>
-			<!--- if it was supplied as an argument, use it --->
-			<cfif StructKeyExists(arguments,loc.i)>
-				<!--- wrap strings in single quotes.. this needs more robustness.. (there's that word again!) --->
-				<cfif IsNumeric(arguments[loc.i])>
-				<cfelseif Left(arguments[loc.i],1) IS "{" && Right(arguments[loc.i],1) IS "}">
-				<cfelseif Left(arguments[loc.i],1) IS "[" && Right(arguments[loc.i],1) IS "]">
-				<cfelseif ListFind("true,false", arguments[loc.i]) gt 0>
-				<cfelseif ListFindNoCase("onChangeMonthYear,onClose,onSelect,beforeShowDay", loc.i) gt 0>
-				<cfelse>
-					<cfset arguments[loc.i] = "'#arguments[loc.i]#'">
-				</cfif>
-				<cfset ArrayAppend(loc.options,"#loc.i#:#arguments[loc.i]#")>
-			</cfif>
-		</cfloop>
-		<!--- define a selector --->
-		<cfif StructKeyExists(arguments,"id")>
-			<cfset loc.selector = "###arguments.id#">
-		<cfelseif StructKeyExists(arguments,"name")>
-			<cfset loc.selector = "###arguments.name#">
-		<cfelseif StructKeyExists(arguments,"objectName")>
-			<cfset loc.selector = "###arguments.objectName#-#arguments.property#">
-		</cfif>
-
-		<!--- javascript --->
-		<cfif ArrayLen(loc.options) gt 0>
-			<cfset loc.javascriptOptions = "{#ArrayToList(loc.options, ", ")#}">
-		<cfelse>
-			<cfset loc.javascriptOptions = "">
-		</cfif>
-		<cfset loc.javascript = "<script>$(window).load(function() {$('#loc.selector#').datepicker(#loc.javascriptOptions#)});</script>">
-
-		<cfreturn loc>
-	</cffunction>
-
-	<!--- map common jquery date masks to CF.. i'm sure this could be elegant-er (?) --->
-	<cffunction name="$datePickerMapDateMask" access="public" output="false">
-		<cfargument name="mask" required="true">
-		<cfset var loc = {} />
-		<!---
-		datepicker
-		==================================
-		d - day of month (no leading zero)
-		dd - day of month (two digit)
-		D - day name short
-		DD - day name long
-		m - month of year (no leading zero)
-		mm - month of year (two digit)
-		M - month name short
-		MM - month name long
-		y - year (two digit)
-		yy - year (four digit)
-
-		CF
-		==================================
-		d: Day of the month as digits; no leading zero for single-digit days.
-		dd: Day of the month as digits; leading zero for single-digit days.
-		ddd: Day of the week as a three-letter abbreviation.
-		dddd: Day of the week as its full name.
-		m: Month as digits; no leading zero for single-digit months.
-		mm: Month as digits; leading zero for single-digit months.
-		mmm: Month as a three-letter abbreviation.
-		mmmm: Month as its full name.
-		yy: Year as last two digits; leading zero for years less than 10.
-		yyyy: Year represented by four digits.
-		gg: Period/era string. Ignored. Reserved. The following masks tell how to format the full date and cannot be combined with other masks:
-		short: equivalent to m/d/y
-		medium: equivalent to mmm d, yyyy
-		long: equivalent to mmmm d, yyyy
-		full: equivalent to dddd, mmmm d, yyyy
-		 --->
-		<cfset loc.return = Replace(arguments.mask,"y","yy","all")>
-		<cfreturn loc.return>
-	</cffunction>
-
-</cfcomponent>
+}

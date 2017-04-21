@@ -1,2 +1,1 @@
-<cfcomponent extends="wheelsMapping.Controller">
-</cfcomponent> 
+component extends="wheels.Controller" {}
