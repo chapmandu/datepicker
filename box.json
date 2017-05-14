@@ -1,8 +1,8 @@
 {
  "name":"Datepicker",
- "version":"2.0.0",
- "author":"Tom King",
- "location":"chapmandu/datepicker#v0.0.4",
+ "version":"2.0.1",
+ "author":"Adam Chapman",
+ "location":"chapmandu/datepicker#v2.0.1",
  "directory":"/plugins/",
  "createPackageDirectory":true,
  "packageDirectory":"Datepicker",
