@@ -1,13 +1,13 @@
 ﻿<cfoutput>
-<h1>DatePicker V2.0.1</h1>
+<h1>DatePicker</h1>
 <h3>Use a jQuery UI datePicker widget in your CFWheels forms</h3>
 
 <p>datePicker and datePickerTag functions accept the same arguments as CFWheels textField and textFieldTag functions respectively, but they also accept all options for the <a href="http://jqueryui.com/demos/datepicker/" target="_blank">jQuery datePicker widget</a></p>
 
-<h2>Following the road to DatePicker Glory</h2>
+<h2>Begin the DatePicker journey</h2>
 <ul>
-	<li>Install the DatePicker plugin</li>
-	<li>Make sure you have setup jQuery AND jQuery UI in your app (Consider the <a href="http://cfwheels.org/plugins/listing/73" target="_blank">jQuack plugin</a>)</li>
+	<li>Install the DatePicker plugin (Consider using Commandbox &amp; Forgebox)</li>
+	<li>Make sure you have setup jQuery AND jQuery UI in your app</li>
 	<li>Use the <code>datePicker()</code> and <code>datePickerTag()</code> form helpers</li>
 </ul>
 
@@ -28,7 +28,7 @@
 	<ul>
 		<li>Not accept some unusual <code>dateFormat</code> values</li>
 		<li>Not work as described</li>
-		<li>Rot your teeth</li>
+		<li>Be a total disaster</li>
 	</ul>
 </p>
 </cfoutput>
