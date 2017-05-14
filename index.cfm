@@ -1,5 +1,5 @@
 ﻿<cfoutput>
-<h1>DatePicker V1.0.4</h1>
+<h1>DatePicker V2.0.1</h1>
 <h3>Use a jQuery UI datePicker widget in your CFWheels forms</h3>
 
 <p>datePicker and datePickerTag functions accept the same arguments as CFWheels textField and textFieldTag functions respectively, but they also accept all options for the <a href="http://jqueryui.com/demos/datepicker/" target="_blank">jQuery datePicker widget</a></p>
