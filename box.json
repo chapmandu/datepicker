@@ -1,22 +1,22 @@
 {
- "name":"Datepicker",
- "version":"2.0.1",
- "author":"Adam Chapman",
- "location":"chapmandu/datepicker#v2.0.1",
- "directory":"/plugins/",
- "createPackageDirectory":true,
- "packageDirectory":"Datepicker",
- "slug":"datepicker",
- "type":"cfwheels-plugins",
- "homepage":"https://github.com/chapmandu/datepicker",
- "shortDescription":"Datepicker Plugin for CFWheels",
- "keywords":"datepicker",
- "private":false,
- "scripts": {
-   "postVersion":"package set location='chapmandu/datepicker#v`package version`'",
-   "postPublish":"!git push --follow-tags",
-   "patch-release":"bump --patch && publish",
-   "minor-release":"bump --minor && publish",
-   "major-release":"bump --major && publish"
-  }
+    "name":"Datepicker",
+    "version":"2.0.2",
+    "author":"Adam Chapman",
+    "location":"chapmandu/datepicker#v2.0.2",
+    "directory":"/plugins/",
+    "createPackageDirectory":true,
+    "packageDirectory":"Datepicker",
+    "slug":"datepicker",
+    "type":"cfwheels-plugins",
+    "homepage":"https://github.com/chapmandu/datepicker",
+    "shortDescription":"Datepicker Plugin for CFWheels",
+    "keywords":"datepicker",
+    "private":false,
+    "scripts":{
+        "postVersion":"package set location='chapmandu/datepicker#v`package version`'",
+        "postPublish":"!git push --follow-tags",
+        "patch-release":"bump --patch && publish",
+        "minor-release":"bump --minor && publish",
+        "major-release":"bump --major && publish"
+    }
 }
