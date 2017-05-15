@@ -4,7 +4,16 @@
 		this.version = "2.0";
 		return this;
 	}
-
+	/**
+	 * Render a jQueryUI style datepicker widget for a CFWheels form object property
+	 *
+	 * [section: Plugins]
+	 * [category: DatePicker]
+	 *
+	 * @objectName The name of the Object
+	 * @property The property on the object
+	 * @head Whether to add Javascript configuration to htmlhead or not
+	 */
 	public string function datePicker(
 		required string objectName,
 		required string property,
@@ -13,7 +22,16 @@
 		$args(name="datePicker", args=arguments);
 		return $datePickerWriteOutput(argumentCollection=arguments);
 	}
-
+	/**
+	 * Render a jQueryUI style datepicker widget for a CFWheels form tag
+	 *
+	 * [section: Plugins]
+	 * [category: DatePicker]
+	 *
+	 * @name The name of the form field
+	 * @value The value of the form field
+	 * @head Whether to add Javascript configuration to htmlhead or not
+	 */
 	public string function datePickerTag(
 		required string name,
 		string value="",
@@ -22,7 +40,9 @@
 		$args(name="datePickerTag", args=arguments);
 		return $datePickerWriteOutput(argumentCollection=arguments);
 	}
-
+	/**
+	 * Internal Function
+	 */
 	public string function $datePickerWriteOutput() {
 		local.dp = $datePicker(argumentCollection=arguments);
 		//  call wheels helper based on arguments supplied
@@ -39,7 +59,9 @@
 		}
 		return local.return;
 	}
-
+	/**
+	 * Internal Function
+	 */
 	public struct function $datePicker() {
 		local.rv = {};
 		//  default dateformat
